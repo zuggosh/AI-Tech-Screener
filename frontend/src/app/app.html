@@ -1,0 +1,61 @@
+<div style="max-width: 1000px; margin: 40px auto; font-family: system-ui, sans-serif;">
+  <h2>AI Tech Screener Dashboard</h2>
+  
+  <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+    <div style="flex: 1;">
+      <label style="display: block; font-weight: bold; margin-bottom: 8px;">Candidate Resume</label>
+      <textarea 
+        [(ngModel)]="resumeText" 
+        placeholder="Paste work experience, tech stack..." 
+        style="width: 100%; box-sizing: border-box; height: 200px; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; resize: vertical;"
+      ></textarea>
+    </div>
+    
+    <div style="flex: 1;">
+      <label style="display: block; font-weight: bold; margin-bottom: 8px;">Job Description</label>
+      <textarea 
+        [(ngModel)]="jobDescription" 
+        placeholder="Paste job requirements..." 
+        style="width: 100%; box-sizing: border-box; height: 200px; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; resize: vertical;"
+      ></textarea>
+    </div>
+  </div>
+
+  <button 
+    (click)="runAgents()" 
+    [disabled]="isLoading()" 
+    style="width: 100%; padding: 14px; margin-bottom: 30px; border-radius: 6px; cursor: pointer; background: #0f172a; color: white; border: none; font-size: 16px; font-weight: 500;">
+    {{ isLoading() ? 'Analysis running (LangGraph active)...' : 'Run Screening' }}
+  </button>
+
+  <div style="display: flex; gap: 20px; align-items: flex-start;">
+    <!-- Left column: State Log -->
+    <div style="flex: 1; padding: 20px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; position: sticky; top: 20px;">
+      <h3 style="margin-top: 0; font-size: 16px;">Trace:</h3>
+      <ul style="color: #475569; font-size: 14px; padding-left: 20px; margin-bottom: 0;">
+        <li *ngFor="let step of history()" style="margin-bottom: 8px;">{{ step }}</li>
+      </ul>
+    </div>
+
+    <!-- Right column: Final Results -->
+    <div *ngIf="finalResponse()" style="flex: 1.5; display: flex; flex-direction: column; gap: 15px;">
+      
+      <div style="padding: 20px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="margin: 0;">Tech Lead Verdict</h3>
+        <span [style.color]="score()! >= 60 ? '#16a34a' : '#dc2626'" style="font-size: 24px; font-weight: bold;">
+          {{ score() }}/100
+        </span>
+      </div>
+
+      <div *ngIf="missingSkills().length > 0" style="padding: 15px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; color: #991b1b;">
+        <strong>Critical missing skills:</strong> {{ missingSkills().join(', ') }}
+      </div>
+
+      <div style="padding: 20px; background: white; border-radius: 8px; border: 1px solid #e2e8f0;">
+        <h4 style="margin-top: 0; color: #334155;">{{ score()! >= 60 ? 'Generated interview questions:' : 'Generated rejection:' }}</h4>
+        <pre style="white-space: pre-wrap; font-family: inherit; line-height: 1.6; margin: 0; color: #1e293b;">{{ finalResponse() }}</pre>
+      </div>
+
+    </div>
+  </div>
+</div>
